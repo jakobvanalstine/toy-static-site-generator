@@ -1,0 +1,4 @@
+.git
+.editorconfig
+__pycache__/
+public/
