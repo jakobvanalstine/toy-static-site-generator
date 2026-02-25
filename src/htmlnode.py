@@ -6,9 +6,7 @@ class HTMLNode:
             raise ValueError("HTMLNode.tag must be truthy str or None")
 
         if value is not None and not isinstance(value, str):
-            raise TypeError("HTMLNode.value must be truthy str or None")
-        elif value == "":
-            raise ValueError("HTMLNode.value must be truthy str or None")
+            raise TypeError("HTMLNode.value must be str or None")
 
         if children is not None and not isinstance(children, list):
             raise TypeError("HTMLNode.children must be truthy list or None")
@@ -47,11 +45,28 @@ class LeafNode(HTMLNode):
         if self.value is None:
             raise ValueError("LeafNode.value must not be None")
 
-        match self.tag:
-            case None:
-                return f"{self.value}"
-            case _:
-                return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+        if self.tag is None:
+            return f"{self.value}"
+
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
     def __repr__(self):
         return f"LeafNode({self.tag}, {self.value}, {self.props})"
+
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag, children, props=None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if self.tag is None:
+            raise ValueError("ParentNode.tag must not be None")
+
+        if self.children is None:
+            raise ValueError("ParentNode.children must not be None")
+
+        injection = "".join(child.to_html() for child in self.children)
+        return f"<{self.tag}>{injection}</{self.tag}>"
+
+    def __repr__(self):
+        return f"ParentNode({self.tag}, {self.children}, {self.props})"

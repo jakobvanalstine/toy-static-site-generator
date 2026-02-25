@@ -13,12 +13,10 @@ class TextType(Enum):
 class TextNode:
     def __init__(self, text, text_type, url=None):
         if not isinstance(text, str):
-            raise TypeError("TextNode.text must be truthy str")
-        elif text == "":
-            raise ValueError("TextNode.text must be truthy str")
+            raise TypeError("TextNode.text must be str")
 
-        if not isinstance(text_type, TextType):
-            raise TypeError("TextNode.text_type must be TextType")
+        if text_type is not None and not isinstance(text_type, TextType):
+            raise TypeError("TextNode.text_type must be TextType or None")
 
         if url is not None and not isinstance(url, str):
             raise TypeError("TextNode.url must be truthy str or None")
