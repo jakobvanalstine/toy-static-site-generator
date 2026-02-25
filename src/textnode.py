@@ -11,10 +11,19 @@ class TextType(Enum):
 
 
 class TextNode:
-    def __init__(self, text=None, text_type=None, url=None):
-        self.text = text if isinstance(text, str) else None
-        self.text_type = text_type if isinstance(text_type, TextType) else None
-        self.url = url if isinstance(url, str) else None
+    def __init__(self, text, text_type, url=None):
+        if not text or not isinstance(text, str):
+            raise TypeError("TextNode.text must be truthy str")
+
+        if not isinstance(text_type, TextType):
+            raise TypeError("TextNode.text_type must be TextType")
+
+        if url is not None and (not url or not isinstance(url, str)):
+            raise TypeError("TextNode.url must be truthy str or None")
+
+        self.text = text
+        self.text_type = text_type
+        self.url = url
 
     def __eq__(self, other):
         return (

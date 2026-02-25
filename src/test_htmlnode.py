@@ -4,6 +4,19 @@ from htmlnode import HTMLNode
 
 
 class TestHTMLNode(unittest.TestCase):
+    def test_types(self):
+        with self.assertRaises(TypeError):
+            node = HTMLNode("", "", [], {})
+
+    def test_none(self):
+        node = HTMLNode()
+        self.assertTrue(
+            node.tag is None
+            and node.value is None
+            and node.children is None
+            and node.props is None
+        )
+
     def test_repr(self):
         node = HTMLNode(
             "a",
@@ -32,22 +45,6 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(
             node.props_to_html(),
             ' href="https://www.boot.dev" target="_blank"',
-        )
-
-    def test_none(self):
-        node = HTMLNode()
-        self.assertTrue(
-            node.tag is None
-            and node.value is None
-            and node.children is None
-            and node.props is None
-        )
-        node2 = HTMLNode("", "", [], {})
-        self.assertTrue(
-            node2.tag == None
-            and node2.value == None
-            and node2.children == None
-            and node2.props == None
         )
 
 
