@@ -14,8 +14,12 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node", TextType.BOLD)
         self.assertNotEqual(node, node2)
 
-    def test_types(self):
+    def test_type_error(self):
         with self.assertRaises(TypeError):
+            node = TextNode(0, 0, 0)
+
+    def test_value_error(self):
+        with self.assertRaises(ValueError):
             node = TextNode("", "bold", "")
 
     def test_none(self):

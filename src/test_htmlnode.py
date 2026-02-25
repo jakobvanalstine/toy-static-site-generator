@@ -1,11 +1,15 @@
 import unittest
 
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
 
 class TestHTMLNode(unittest.TestCase):
-    def test_types(self):
+    def test_type_error(self):
         with self.assertRaises(TypeError):
+            node = HTMLNode(0, 0, 0, 0)
+
+    def test_value_error(self):
+        with self.assertRaises(ValueError):
             node = HTMLNode("", "", [], {})
 
     def test_none(self):
@@ -46,6 +50,20 @@ class TestHTMLNode(unittest.TestCase):
             node.props_to_html(),
             ' href="https://www.boot.dev" target="_blank"',
         )
+
+
+class TestLeafNode(unittest.TestCase):
+    def test_type_error(self):
+        with self.assertRaises(TypeError):
+            node = HTMLNode(0, 0, 0, 0)
+
+    def test_value_error(self):
+        with self.assertRaises(ValueError):
+            node = HTMLNode("", "", [], {})
+
+    def test_leaf_to_html_p(self):
+        node = LeafNode("p", "Hello, world!")
+        self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
 
 
 if __name__ == "__main__":
