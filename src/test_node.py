@@ -2,7 +2,12 @@ import unittest
 
 from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from nodefuncs import text_node_to_html_node, split_nodes_delimiter
+from nodefuncs import (
+    text_node_to_html_node,
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+)
 
 
 class TestTextNode(unittest.TestCase):
@@ -247,7 +252,9 @@ class TestInlineMarkdown(unittest.TestCase):
         )
 
     def test_split_nodes_delimiter(self):
-        node = TextNode("This is text with a `code block` word", TextType.PLAIN)
+        node = TextNode(
+            "This is text with a `code block` word", TextType.PLAIN
+        )
         new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
         self.assertListEqual(
             new_nodes,
@@ -257,6 +264,38 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode(" word", TextType.PLAIN),
             ],
         )
+
+    def test_extract_markdown_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        alt_text_and_url = extract_markdown_images(text)
+        self.assertListEqual(
+            alt_text_and_url,
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+            ],
+        )
+
+    def test_extract_markdown_images_bad(self):
+        text = 'The official said that the site was !["a [major] disaster"](https://i.imgur.com/aKaOqIh.gif) and ![apologized later](https://i.imgur.com/some-image-(copy).jpeg)'
+        alt_text_and_url = extract_markdown_images(text)
+        self.assertListEqual(alt_text_and_url, [])
+
+    def test_extract_markdown_links(self):
+        text = "This is text with a link to [rick roll](https://i.imgur.com/aKaOqIh.gif) and [obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        alt_text_and_url = extract_markdown_links(text)
+        self.assertListEqual(
+            alt_text_and_url,
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+            ],
+        )
+
+    def test_extract_markdown_links_bad(self):
+        text = 'The official said that the site was ["a [major] disaster"](https://www.news.com) and [apologized later](https://www.new.com/a-(bad)-day-out)'
+        alt_text_and_url = extract_markdown_links(text)
+        self.assertListEqual(alt_text_and_url, [])
 
 
 if __name__ == "__main__":
