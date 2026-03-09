@@ -4,6 +4,7 @@ from textnode import TextNode, TextType
 from htmlnode import HTMLNode, LeafNode, ParentNode
 from nodefuncs import (
     text_node_to_html_node,
+    text_to_textnodes,
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
@@ -371,6 +372,37 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode(" with text that follows", TextType.PLAIN),
             ],
             new_nodes,
+        )
+
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        text_nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.PLAIN),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.PLAIN),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.PLAIN),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.PLAIN),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.PLAIN),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            text_nodes
+        )
+
+    def test_link_in_code_block_to_textnodes(self):
+        text = "Markdown uses the format `[anchor text](https://www.address.com)` for inline links."
+        text_nodes = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("Markdown uses the format ", TextType.PLAIN),
+                TextNode("[anchor text](https://www.address.com)", TextType.CODE),
+                TextNode(" for inline links.", TextType.PLAIN),
+            ],
+            text_nodes
         )
 
 
