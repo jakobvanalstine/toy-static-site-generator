@@ -54,3 +54,61 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     return re.findall(r"(?:[^!]|$)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+
+def split_nodes_image(old_nodes):
+    def helper():
+        for node in old_nodes:
+            if node.text_type != TextType.PLAIN:
+                yield node
+                continue
+            text = node.text
+            images = extract_markdown_images(text)
+            if len(images) == 0:
+                yield node
+                continue
+            for image in images:
+                parts = text.split(f"![{image[0]}]({image[1]})", 1)
+                if len(parts) != 2:
+                    raise Exception("Invalid markdown")
+                if parts[0] != "":
+                    yield TextNode(parts[0], TextType.PLAIN)
+                yield TextNode(
+                    image[0],
+                    TextType.IMAGE,
+                    image[1],
+                )
+                text = parts[1]
+        if text != "":
+            yield TextNode(text, TextType.PLAIN)
+
+    return list(helper())
+
+
+def split_nodes_link(old_nodes):
+    def helper():
+        for node in old_nodes:
+            if node.text_type != TextType.PLAIN:
+                yield node
+                continue
+            text = node.text
+            links = extract_markdown_links(text)
+            if len(links) == 0:
+                yield node
+                continue
+            for link in links:
+                parts = text.split(f"[{link[0]}]({link[1]})", 1)
+                if len(parts) != 2:
+                    raise Exception("Invalid markdown")
+                if parts[0] != "":
+                    yield TextNode(parts[0], TextType.PLAIN)
+                yield TextNode(
+                    link[0],
+                    TextType.LINK,
+                    link[1],
+                )
+                text = parts[1]
+        if text != "":
+            yield TextNode(text, TextType.PLAIN)
+
+    return list(helper())
