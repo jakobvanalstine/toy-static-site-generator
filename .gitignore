@@ -2,3 +2,4 @@
 .editorconfig
 __pycache__/
 public/
+config.py
