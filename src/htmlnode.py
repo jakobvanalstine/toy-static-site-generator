@@ -48,6 +48,9 @@ class LeafNode(HTMLNode):
         if self.tag is None:
             return f"{self.value}"
 
+        if self.tag == "img":
+            return f"<{self.tag}{self.props_to_html()}{self.value}>"
+
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
     def __repr__(self):
@@ -66,7 +69,7 @@ class ParentNode(HTMLNode):
             raise ValueError("ParentNode.children must not be None")
 
         injection = "".join(child.to_html() for child in self.children)
-        return f"<{self.tag}>{injection}</{self.tag}>"
+        return f"<{self.tag}{self.props_to_html()}>{injection}</{self.tag}>"
 
     def __repr__(self):
         return f"ParentNode({self.tag}, {self.children}, {self.props})"
