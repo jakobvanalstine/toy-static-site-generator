@@ -7,9 +7,7 @@ from blockfuncs import markdown_to_html_node
 __all__ = ["copy_static_to_public", "generate_pages"]
 
 
-def copy_static_to_public(public_directory, static_directory, basepath):
-    if basepath:
-        public_directory = os.path.normpath(public_directory + basepath)
+def copy_static_to_public(public_directory, static_directory):
     if not os.path.exists(static_directory):
         raise FileNotFoundError(f'"{static_directory}" does not exist')
     if os.path.exists(public_directory):
@@ -90,8 +88,6 @@ def _generate_page(from_path, template_path, dest_path, basepath):
 
 
 def generate_pages(from_directory, template_path, dest_directory, basepath):
-    if basepath:
-        dest_directory = os.path.normpath(dest_directory + basepath)
     if not os.path.exists(from_directory):
         raise FileNotFoundError(f'"{from_directory}" does not exist')
     if not os.path.exists(dest_directory):
