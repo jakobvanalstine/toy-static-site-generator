@@ -7,7 +7,9 @@ from blockfuncs import markdown_to_html_node
 __all__ = ["copy_static_to_public", "generate_pages"]
 
 
-def copy_static_to_public(public_directory, static_directory):
+def copy_static_to_public(public_directory, static_directory, basepath):
+    if basepath:
+        public_directory = os.path.normpath(public_directory + basepath)
     if not os.path.exists(static_directory):
         raise FileNotFoundError(f'"{static_directory}" does not exist')
     if os.path.exists(public_directory):
@@ -40,14 +42,12 @@ def copy_static_to_public(public_directory, static_directory):
             logging.info(f'mirroring "{branch}" as "{equivalent_for_public}"')
             os.makedirs(equivalent_for_public)
 
-    print(repr(files_to_copy))
     for file in files_to_copy:
         relative_filename = os.path.relpath(file, static_directory)
         equivalent_for_public = os.path.join(
             public_directory, relative_filename
         )
         logging.info(f'copying "{file}" to "{equivalent_for_public}"')
-        print(file, equivalent_for_public)
         shutil.copy(file, equivalent_for_public)
 
 
@@ -61,7 +61,7 @@ def extract_title(markdown):
     return title
 
 
-def _generate_page(from_path, template_path, dest_path):
+def _generate_page(from_path, template_path, dest_path, basepath):
     logging.info(
         f'Generating "{from_path}" to "{dest_path}" using "{template_path}"'
     )
@@ -82,12 +82,16 @@ def _generate_page(from_path, template_path, dest_path):
 
     content = template.replace("{{ Title }}", title)
     content = content.replace("{{ Content }}", html)
+    content = content.replace('href="/', f'href="{basepath}')
+    content = content.replace('src="/', f'src="{basepath}')
 
     with open(dest_path, "w+") as file:
         file.write(content)
 
 
-def generate_pages(from_directory, template_path, dest_directory):
+def generate_pages(from_directory, template_path, dest_directory, basepath):
+    if basepath:
+        dest_directory = os.path.normpath(dest_directory + basepath)
     if not os.path.exists(from_directory):
         raise FileNotFoundError(f'"{from_directory}" does not exist')
     if not os.path.exists(dest_directory):
@@ -124,4 +128,4 @@ def generate_pages(from_directory, template_path, dest_directory):
             dest_directory, relative_filename.replace(".md", ".html")
         )
         logging.info(f'copying "{file}" to "{equivalent_for_dest}"')
-        _generate_page(file, template_path, equivalent_for_dest)
+        _generate_page(file, template_path, equivalent_for_dest, basepath)

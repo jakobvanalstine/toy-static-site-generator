@@ -1,3 +1,4 @@
+import sys
 from os import getcwd, walk, path
 
 from generate_website import *
@@ -9,8 +10,10 @@ def main():
     if working_directory != config.PROJECT_ROOT:
         raise RuntimeError("must execute script from project root")
 
-    copy_static_to_public(config.PATH_TO_PUBLIC, config.PATH_TO_STATIC)
-    generate_pages(config.PATH_TO_MARKDOWN, config.PATH_TO_TEMPLATE, config.PATH_TO_PUBLIC)
+    basepath = path.join("/", sys.argv[1])
+
+    copy_static_to_public(config.PATH_TO_PUBLIC, config.PATH_TO_STATIC, basepath)
+    generate_pages(config.PATH_TO_MARKDOWN, config.PATH_TO_TEMPLATE, config.PATH_TO_PUBLIC, basepath)
 
 
 if __name__ == "__main__":
